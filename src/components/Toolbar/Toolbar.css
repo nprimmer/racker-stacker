@@ -29,3 +29,37 @@
   background: #f5f5f5;
   border-color: #3B82F6;
 }
+
+.toolbar-btn:active {
+  transform: scale(0.98);
+}
+
+.toolbar-label {
+  font-size: 13px;
+  color: #374151;
+  font-weight: 500;
+  margin-right: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.toolbar-select {
+  padding: 6px 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 13px;
+  background-color: white;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  min-width: 140px;
+}
+
+.toolbar-select:hover {
+  border-color: #9ca3af;
+}
+
+.toolbar-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}

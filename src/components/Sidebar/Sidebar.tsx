@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react'
-import { ComponentType, RackComponent, RackConfig, COMPONENT_COLORS } from '../../types/rack'
+import { ComponentType, RackComponent, RackConfig, COMPONENT_COLORS, FRONT_BACK_OPTIONS, SIDE_OPTIONS } from '../../types/rack'
+import NetworkInterfaceManager from '../NetworkInterfaceManager/NetworkInterfaceManager'
+import SubComponentManager from '../SubComponentManager/SubComponentManager'
+import TagsManager from '../TagsManager/TagsManager'
 import './Sidebar.css'
 
 interface SidebarProps {
@@ -25,7 +28,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   })
   const [error, setError] = useState<string>('')
 
-  const componentTypes: ComponentType[] = ['compute', 'network', 'storage', 'power', 'cooling', 'other']
+  const componentTypes: ComponentType[] = ['compute', 'network', 'storage', 'power', 'cooling', 'patch_panel', 'other']
 
   // Calculate the next available position whenever rack config or component height changes
   useEffect(() => {
@@ -91,7 +94,10 @@ const Sidebar: React.FC<SidebarProps> = ({
     onComponentAdd({
       ...newComponent,
       color: COMPONENT_COLORS[newComponent.type],
-      metadata: {}
+      metadata: {},
+      networkInterfaces: [],
+      tags: [],
+      subComponents: []
     })
 
     // Reset form
@@ -170,7 +176,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           >
             {componentTypes.map(type => (
               <option key={type} value={type}>
-                {type.charAt(0).toUpperCase() + type.slice(1)}
+                {type.charAt(0).toUpperCase() + type.slice(1).replace('_', ' ')}
               </option>
             ))}
           </select>
@@ -209,23 +215,125 @@ const Sidebar: React.FC<SidebarProps> = ({
           </div>
 
           <div className="form-group">
-            <label>IP Address</label>
+            <label>Weight (lbs)</label>
             <input
-              type="text"
-              value={selectedComponent.metadata?.ipAddress || ''}
-              onChange={(e) => handleMetadataUpdate('ipAddress', e.target.value)}
-              placeholder="e.g., 192.168.1.100"
+              type="number"
+              value={selectedComponent.weight ?? ''}
+              onChange={(e) => {
+                const value = e.target.value;
+                onComponentUpdate(selectedComponent.id, {
+                  weight: value === '' ? undefined : Number(value)
+                })
+              }}
+              placeholder="e.g., 45"
+              min="0"
+              step="0.1"
             />
           </div>
 
           <div className="form-group">
-            <label>Subnet</label>
+            <label>Power Consumption</label>
             <input
               type="text"
-              value={selectedComponent.metadata?.subnet || ''}
-              onChange={(e) => handleMetadataUpdate('subnet', e.target.value)}
-              placeholder="e.g., 192.168.1.0/24"
+              value={selectedComponent.metadata?.powerConsumption || ''}
+              onChange={(e) => handleMetadataUpdate('powerConsumption', e.target.value)}
+              placeholder="e.g., 500W"
             />
+          </div>
+
+          <div className="form-group config-row">
+            <label>PDU Configuration</label>
+            <div className="config-inputs">
+              <input
+                type="number"
+                value={selectedComponent.pduConfig?.count || 0}
+                onChange={(e) => onComponentUpdate(selectedComponent.id, {
+                  pduConfig: {
+                    count: Number(e.target.value) || 0,
+                    frontBack: selectedComponent.pduConfig?.frontBack || 'back',
+                    side: selectedComponent.pduConfig?.side || 'center'
+                  }
+                })}
+                placeholder="Count"
+                min="0"
+                max="10"
+                className="count-input"
+              />
+              <select
+                value={selectedComponent.pduConfig?.frontBack || 'back'}
+                onChange={(e) => onComponentUpdate(selectedComponent.id, {
+                  pduConfig: {
+                    count: selectedComponent.pduConfig?.count || 0,
+                    frontBack: e.target.value as any,
+                    side: selectedComponent.pduConfig?.side || 'center'
+                  }
+                })}
+                className="placement-select"
+              >
+                {FRONT_BACK_OPTIONS.map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={selectedComponent.pduConfig?.side || 'center'}
+                onChange={(e) => onComponentUpdate(selectedComponent.id, {
+                  pduConfig: {
+                    count: selectedComponent.pduConfig?.count || 0,
+                    frontBack: selectedComponent.pduConfig?.frontBack || 'back',
+                    side: e.target.value as any
+                  }
+                })}
+                className="placement-select"
+              >
+                {SIDE_OPTIONS.map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>Ethernet Ports</label>
+            <div className="ethernet-config">
+              <div className="config-inputs">
+                <span className="config-label">Front:</span>
+                <input
+                  type="number"
+                  value={selectedComponent.ethernetConfig?.frontCount || 0}
+                  onChange={(e) => onComponentUpdate(selectedComponent.id, {
+                    ethernetConfig: {
+                      frontCount: Number(e.target.value) || 0,
+                      backCount: selectedComponent.ethernetConfig?.backCount || 0
+                    }
+                  })}
+                  placeholder="Front count"
+                  min="0"
+                  max="100"
+                  className="ethernet-count-input"
+                />
+              </div>
+              <div className="config-inputs">
+                <span className="config-label">Back:</span>
+                <input
+                  type="number"
+                  value={selectedComponent.ethernetConfig?.backCount || 0}
+                  onChange={(e) => onComponentUpdate(selectedComponent.id, {
+                    ethernetConfig: {
+                      frontCount: selectedComponent.ethernetConfig?.frontCount || 0,
+                      backCount: Number(e.target.value) || 0
+                    }
+                  })}
+                  placeholder="Back count"
+                  min="0"
+                  max="100"
+                  className="ethernet-count-input"
+                />
+              </div>
+            </div>
           </div>
 
           <div className="form-group">
@@ -237,6 +345,25 @@ const Sidebar: React.FC<SidebarProps> = ({
               rows={3}
             />
           </div>
+
+          <div className="form-group">
+            <label>Tags</label>
+            <TagsManager
+              tags={selectedComponent.tags || []}
+              onChange={(tags) => onComponentUpdate(selectedComponent.id, { tags })}
+            />
+          </div>
+
+          <NetworkInterfaceManager
+            interfaces={selectedComponent.networkInterfaces || []}
+            onChange={(interfaces) => onComponentUpdate(selectedComponent.id, { networkInterfaces: interfaces })}
+          />
+
+          <SubComponentManager
+            subComponents={selectedComponent.subComponents || []}
+            parentComponentId={selectedComponent.id}
+            onChange={(subComponents) => onComponentUpdate(selectedComponent.id, { subComponents })}
+          />
 
           <button
             className="btn btn-danger"

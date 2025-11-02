@@ -87,6 +87,8 @@
   font-size: 14px;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
   user-select: none;
+  overflow: hidden;
+  padding: 4px;
 }
 
 .rack-component:hover {
@@ -98,26 +100,46 @@
   z-index: 10;
 }
 
+.component-content {
+  width: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
 .component-label {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
   font-weight: 500;
+  width: 100%;
 }
 
 .component-name {
-  font-size: 14px;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 70%;
 }
 
 .component-size {
-  font-size: 12px;
+  font-size: 11px;
   opacity: 0.8;
+  flex-shrink: 0;
 }
 
 .component-device {
   font-size: 11px;
-  opacity: 0.8;
-  margin-top: 2px;
+  opacity: 0.9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 90%;
+  font-style: italic;
 }
 
 .rack-component-preview {
@@ -152,4 +174,63 @@
   font-size: 13px;
   color: #333;
   margin-bottom: 4px;
+}
+
+/* Subcomponent vertical divisions visualization */
+/* Component with subcomponents keeps all default .rack-component styles */
+
+.subcomponent-divisions {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  pointer-events: none;
+}
+
+.subcomponent-division {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-left: 1px solid rgba(0, 0, 0, 0.3);
+  border-right: 1px solid rgba(0, 0, 0, 0.3);
+  background: linear-gradient(90deg,
+    rgba(0, 0, 0, 0.05) 0%,
+    rgba(0, 0, 0, 0) 50%,
+    rgba(0, 0, 0, 0.05) 100%);
+}
+
+.subcomponent-division:first-child {
+  border-left: none;
+}
+
+.subcomponent-division:last-child {
+  border-right: none;
+}
+
+.division-label {
+  position: absolute;
+  bottom: 2px;
+  left: 2px;
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.7);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* Component content should overlay the divisions */
+.rack-component .component-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 4px 8px;
+  pointer-events: none;
+}
+
+.rack-component .component-content > * {
+  pointer-events: auto;
 }

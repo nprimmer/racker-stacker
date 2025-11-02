@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
-import { RackConfig } from '../../types/rack'
+import { RackConfig, DistanceUnit, DISTANCE_UNITS } from '../../types/rack'
+import { ExportService } from '../../services/ExportService'
 import Modal from '../Modal/Modal'
 import './Toolbar.css'
 
@@ -9,9 +10,12 @@ interface ToolbarProps {
   onAddRack: (height: number, name: string) => void
   onStartOver: () => void
   hasRacks: boolean
+  racks: RackConfig[]
+  distanceUnit: DistanceUnit
+  onDistanceUnitChange: (unit: DistanceUnit) => void
 }
 
-const Toolbar: React.FC<ToolbarProps> = ({ onSave, onLoad, onAddRack, onStartOver, hasRacks }) => {
+const Toolbar: React.FC<ToolbarProps> = ({ onSave, onLoad, onAddRack, onStartOver, hasRacks, racks, distanceUnit, onDistanceUnitChange }) => {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [showModal, setShowModal] = useState(false)
   const [showStartOverConfirmation, setShowStartOverConfirmation] = useState(false)
@@ -55,6 +59,22 @@ const Toolbar: React.FC<ToolbarProps> = ({ onSave, onLoad, onAddRack, onStartOve
     setShowModal(false)
   }
 
+  const handleExportPNG = async () => {
+    if (!hasRacks) {
+      alert('Please create at least one rack before exporting.')
+      return
+    }
+    await ExportService.exportToPNG()
+  }
+
+  const handleExportSpreadsheet = () => {
+    if (!hasRacks) {
+      alert('Please create at least one rack before exporting.')
+      return
+    }
+    ExportService.exportToSpreadsheet(racks)
+  }
+
   return (
     <>
       <div className="toolbar">
@@ -66,6 +86,21 @@ const Toolbar: React.FC<ToolbarProps> = ({ onSave, onLoad, onAddRack, onStartOve
           <button className="toolbar-btn" onClick={handleStartOverClick}>
             🔄 Start Over
           </button>
+        </div>
+
+        <div className="toolbar-group">
+          <label className="toolbar-label">Distance Unit:</label>
+          <select
+            className="toolbar-select"
+            value={distanceUnit}
+            onChange={(e) => onDistanceUnitChange(e.target.value as DistanceUnit)}
+          >
+            {DISTANCE_UNITS.map(unit => (
+              <option key={unit.value} value={unit.value}>
+                {unit.label}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div className="toolbar-group">
@@ -83,6 +118,16 @@ const Toolbar: React.FC<ToolbarProps> = ({ onSave, onLoad, onAddRack, onStartOve
             onChange={handleFileLoad}
             style={{ display: 'none' }}
           />
+        </div>
+
+        <div className="toolbar-group">
+          <button className="toolbar-btn" onClick={handleExportPNG}>
+            🖼️ Export as PNG
+          </button>
+
+          <button className="toolbar-btn" onClick={handleExportSpreadsheet}>
+            📊 Export to Excel
+          </button>
         </div>
       </div>
 

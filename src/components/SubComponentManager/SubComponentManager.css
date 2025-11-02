@@ -1,0 +1,156 @@
+.subcomponent-manager {
+  margin-top: 20px;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 15px;
+}
+
+.subcomponents-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.subcomponent-item {
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: white;
+}
+
+.subcomponent-header {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background-color: #f9fafb;
+  cursor: pointer;
+  gap: 10px;
+}
+
+.subcomponent-header:hover {
+  background-color: #f3f4f6;
+}
+
+.subcomponent-name {
+  font-weight: 600;
+  color: #374151;
+  flex: 1;
+  font-size: 13px;
+}
+
+.subcomponent-type {
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.subcomponent-position {
+  background-color: #f3f4f6;
+  color: #6b7280;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  border: 1px solid #e5e7eb;
+}
+
+.subcomponent-details {
+  padding: 15px;
+  background-color: #fafafa;
+  border-top: 1px solid #e5e7eb;
+}
+
+.metadata-section,
+.tags-section {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.metadata-section h5,
+.tags-section h5 {
+  margin: 0 0 10px 0;
+  font-size: 13px;
+  color: #374151;
+  font-weight: 600;
+}
+
+.form-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+  align-items: center;
+}
+
+.form-row label {
+  flex: 0 0 120px;
+  font-size: 12px;
+  color: #374151;
+  font-weight: 500;
+}
+
+.form-row input,
+.form-row select,
+.form-row textarea {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 12px;
+  background-color: white;
+}
+
+.form-row input:focus,
+.form-row select:focus,
+.form-row textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+/* Nested component styling for better visual hierarchy */
+.subcomponent-details .network-interface-manager {
+  background-color: #f9fafb;
+  border-radius: 6px;
+  padding: 15px;
+  margin-top: 15px;
+}
+
+.subcomponent-details .tags-manager {
+  margin-top: 5px;
+}
+
+.config-inputs {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.config-inputs .count-input {
+  flex: 0 0 80px;
+}
+
+.config-inputs .placement-select {
+  flex: 1;
+  min-width: 100px;
+}
+
+.ethernet-config {
+  display: flex;
+  gap: 8px;
+}
+
+.ethernet-count-input {
+  flex: 1;
+  min-width: 60px;
+}
+
+.config-label {
+  flex: 0 0 40px;
+  font-size: 12px;
+  color: #666;
+  display: flex;
+  align-items: center;
+}
