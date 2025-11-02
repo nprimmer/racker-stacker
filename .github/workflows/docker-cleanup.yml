@@ -1,0 +1,67 @@
+name: Cleanup Old Docker Images
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+  schedule:
+    # Also run cleanup weekly on Sunday at 2 AM UTC
+    - cron: '0 2 * * 0'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+
+    steps:
+      - name: Cleanup old package versions
+        uses: actions/delete-package-versions@v5
+        with:
+          package-name: 'racker-stacker'
+          package-type: 'container'
+          min-versions-to-keep: 4
+          delete-only-pre-release-versions: false
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Alternative cleanup using GitHub API
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Get package versions
+          PACKAGE_NAME=$(echo "${{ env.IMAGE_NAME }}" | cut -d'/' -f2)
+          ORG_OR_USER=$(echo "${{ env.IMAGE_NAME }}" | cut -d'/' -f1)
+
+          echo "📦 Fetching versions for package: $PACKAGE_NAME"
+
+          # Get all versions sorted by created_at
+          VERSIONS=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/users/${ORG_OR_USER}/packages/container/${PACKAGE_NAME}/versions" \
+            | jq -r '.[] | "\(.id)|\(.created_at)"' | sort -t'|' -k2 -r)
+
+          # Count total versions
+          TOTAL_VERSIONS=$(echo "$VERSIONS" | wc -l)
+          echo "📊 Total versions found: $TOTAL_VERSIONS"
+
+          if [ "$TOTAL_VERSIONS" -le 4 ]; then
+            echo "✅ Only $TOTAL_VERSIONS versions exist, no cleanup needed (keeping last 4)"
+            exit 0
+          fi
+
+          # Skip the first 4 (newest) and delete the rest
+          echo "$VERSIONS" | tail -n +5 | while IFS='|' read -r VERSION_ID CREATED_AT; do
+            if [ -n "$VERSION_ID" ]; then
+              echo "🗑️  Deleting version $VERSION_ID (created: $CREATED_AT)"
+              curl -X DELETE \
+                -H "Authorization: Bearer $GITHUB_TOKEN" \
+                -H "Accept: application/vnd.github.v3+json" \
+                "https://api.github.com/users/${ORG_OR_USER}/packages/container/${PACKAGE_NAME}/versions/${VERSION_ID}"
+            fi
+          done
+
+          echo "✅ Cleanup completed - kept the 4 most recent versions"

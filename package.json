@@ -1,0 +1,34 @@
+{
+  "name": "racker-stacker",
+  "version": "1.0.0",
+  "description": "This application is used for building a simple plan when preparing a server or network rack. The goal for the final feature set of this application is: - The ability to designate a single rack of a specific height (for example, 42u). - The ability to add components of specific heights for placement within the rack (for example, a 1u, 2u, or 4u server) - The ability to drag-and-drop components throughout the rack for placement. - The ability to add a color-coded label to an individual component that indicates its class (compute, power, network, storage, cooling, etc) - The ability to select two already-placed components in a rack plan and get a distance, in inches, between the two (for the purposes of cable planning) - The ability to add text field data to a given component (device names, IP addresses, subnets) - The ability to save a work-in-progress for later modification - The ability to load a previously saved work-in-progress to allow further modification - The ability to export to a spreadsheet - The ability to export to a png",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nprimmer/racker-stacker.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nprimmer/racker-stacker/issues"
+  },
+  "homepage": "https://github.com/nprimmer/racker-stacker#readme",
+  "devDependencies": {
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "@vitejs/plugin-react": "^5.1.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.1.12"
+  },
+  "dependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  }
+}

@@ -1,0 +1,155 @@
+.rack-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  border-radius: 8px;
+  background: white;
+  border: 2px solid transparent;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.rack-wrapper:hover {
+  border-color: #e5e5e5;
+}
+
+.rack-wrapper.selected {
+  border-color: #3B82F6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.rack-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.rack-header h2 {
+  margin: 0;
+  color: #333;
+  font-size: 18px;
+}
+
+.rack {
+  position: relative;
+  width: 400px;
+  background: #f5f5f5;
+  border: 2px solid #333;
+  border-radius: 4px;
+  overflow: visible;
+  margin: 20px auto;
+}
+
+.rack-units {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 30px;
+  background: #e0e0e0;
+  border-right: 1px solid #999;
+  display: flex;
+  flex-direction: column;
+}
+
+.rack-unit-marker {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid #ccc;
+  font-size: 10px;
+  color: #666;
+  font-weight: 500;
+}
+
+.rack-components {
+  position: relative;
+  margin-left: 30px;
+  width: calc(100% - 30px);
+  height: 100%;
+}
+
+.rack-component {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+  cursor: move;
+  transition: opacity 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 14px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  user-select: none;
+}
+
+.rack-component:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.rack-component.selected {
+  box-shadow: 0 0 0 3px #fbbf24;
+  z-index: 10;
+}
+
+.component-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 500;
+}
+
+.component-name {
+  font-size: 14px;
+}
+
+.component-size {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.component-device {
+  font-size: 11px;
+  opacity: 0.8;
+  margin-top: 2px;
+}
+
+.rack-component-preview {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  background: rgba(59, 130, 246, 0.3);
+  border: 2px dashed #3B82F6;
+  border-radius: 3px;
+  pointer-events: none;
+}
+
+.distance-info {
+  background: #f9f9f9;
+  padding: 15px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+}
+
+.distance-info h3 {
+  margin: 0 0 10px 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.distance-info ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.distance-info li {
+  font-size: 13px;
+  color: #333;
+  margin-bottom: 4px;
+}
