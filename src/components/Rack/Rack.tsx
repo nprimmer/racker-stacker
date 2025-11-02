@@ -117,7 +117,7 @@ const Rack: React.FC<RackProps> = ({ config, selectedComponent, onComponentSelec
     setDragOverPosition(null)
   }
 
-  const handleDragLeave = (e: React.DragEvent) => {
+  const handleDragLeave = () => {
     // Clear the drag preview when leaving the rack
     setDragOverPosition(null)
   }
