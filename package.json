@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:artifact": "./build-artifact.sh",
+    "package:tar": "tar -czf dist/racker-stacker-$(date +%Y%m%d-%H%M%S).tar.gz -C dist . --exclude='*.tar.gz'",
+    "package:tar:latest": "npm run build && tar -czf racker-stacker-latest.tar.gz -C dist ."
   },
   "repository": {
     "type": "git",
