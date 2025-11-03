@@ -18,6 +18,10 @@ on:
 env:
   NODE_VERSION: '20'
 
+permissions:
+  contents: write
+  packages: write
+
 jobs:
   build-artifact:
     runs-on: ubuntu-latest
@@ -35,6 +39,9 @@ jobs:
     - name: Install dependencies
       run: npm ci
 
+    - name: Make build script executable
+      run: chmod +x build-artifact.sh
+
     - name: Run build script
       run: ./build-artifact.sh
 
@@ -45,58 +52,57 @@ jobs:
         path: artifacts/*.tar.gz
         retention-days: 30
 
-    # Delete existing 'latest' release and tag for main branch pushes
-    - name: Delete Latest Release
+    # Create or update 'latest' release for main branch
+    - name: Delete old latest release
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      uses: dev-drprasad/delete-tag-and-release@v1.1
-      with:
-        tag_name: latest
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        delete_release: true
-      continue-on-error: true
+      run: |
+        # Delete existing release if it exists
+        gh release delete latest --yes || true
+        # Delete the tag
+        git push origin :refs/tags/latest || true
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    # Create 'latest' release for main branch
     - name: Create Latest Release
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      uses: softprops/action-gh-release@v2
-      with:
-        tag_name: latest
-        name: Latest Build
-        files: artifacts/*.tar.gz
-        prerelease: true
-        generate_release_notes: false
-        body: |
-          ## Latest Build from Main Branch
+      run: |
+        # Create the release with all tar.gz files
+        gh release create latest \
+          artifacts/*.tar.gz \
+          --title "Latest Build" \
+          --notes "## Latest Build from Main Branch
 
-          **⚠️ This is an automated build from the latest commit on the main branch.**
+        **⚠️ This is an automated build from the latest commit on the main branch.**
 
-          - Commit: ${{ github.sha }}
-          - Branch: main
-          - Build Date: ${{ github.event.head_commit.timestamp }}
+        - Commit: ${{ github.sha }}
+        - Branch: main
+        - Build Date: $(date -u +%Y-%m-%dT%H:%M:%SZ)
 
-          ### Quick Download
+        ### Quick Download
 
-          **📦 [Download racker-stacker-latest.tar.gz](../../releases/download/latest/racker-stacker-latest.tar.gz)**
+        **📦 [Download racker-stacker-latest.tar.gz](../../releases/download/latest/racker-stacker-latest.tar.gz)**
 
-          ### Deployment
+        ### Deployment
 
-          To deploy the artifact:
-          ```bash
-          # Download and extract
-          wget https://github.com/${{ github.repository }}/releases/download/latest/racker-stacker-latest.tar.gz
-          tar -xzf racker-stacker-latest.tar.gz
+        To deploy the artifact:
+        \`\`\`bash
+        # Download and extract
+        wget https://github.com/${{ github.repository }}/releases/download/latest/racker-stacker-latest.tar.gz
+        tar -xzf racker-stacker-latest.tar.gz
 
-          # Serve with your preferred web server
-          ```
+        # Serve with your preferred web server
+        \`\`\`
 
-          ### What's Included
-          - Minified and optimized JavaScript/CSS
-          - All required static assets
-          - Build metadata (build-info.json)
+        ### What's Included
+        - Minified and optimized JavaScript/CSS
+        - All required static assets
+        - Build metadata (build-info.json)
 
-          **Note:** This release is automatically updated with each push to main branch.
+        **Note:** This release is automatically updated with each push to main branch." \
+          --prerelease \
+          --target ${{ github.sha }}
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     # Upload to S3 if configured (requires AWS credentials in secrets)
     - name: Configure AWS credentials
